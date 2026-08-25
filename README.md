@@ -6,30 +6,38 @@ Sistema de tienda online desarrollado con Python, Flask, PostgreSQL y Bootstrap 
 
 ### 1. Clonar el repositorio
 ```bash
-git clone [https://github.com/Mari-Vasquez/Proyecto-Tienda-Online.git](https://github.com/Mari-Vasquez/Proyecto-Tienda-Online.git)
+git clone https://github.com/Mari-Vasquez/Proyecto-Tienda-Online.git
 cd Proyecto-Tienda-Online
+```
 
-2. Crear y activar el entorno virtual
-Bash
+### 2. Crear y activar el entorno virtual
+
+``` bash
 python -m venv venv
 # En Windows:
 venv\Scripts\activate
 # En Linux/Mac:
 source venv/bin/activate
-3. Instalar dependencias
-Bash
+```
+
+### 3. Instalar dependencias
+``` bash
 pip install -r requirements.txt
-4. Configurar la Base de Datos PostgreSQL
+``` 
+
+### 4. Configurar la Base de Datos PostgreSQL
 Ajusta las variables en config.py o .env:
 
-Plaintext
+``` bash
 DATABASE_URL=postgresql://postgres:tu_contraseña@localhost:5432/tienda_online
 SECRET_KEY=tu_clave_secreta
+``` 
 
-5. Inicializar la base de datos y ejecutar la app
-Bash
+### 5. Inicializar la base de datos y ejecutar la app
+
 python init_db.py
 flask run
+
 🔑 Credenciales de Prueba
 Administrador:
 
@@ -42,6 +50,7 @@ Cliente:
 Email: cliente@tienda.com
 
 Contraseña: cliente123
+
 
 ## 📸 Capturas de Pantalla
 
