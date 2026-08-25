@@ -1,4 +1,3 @@
-Markdown
 # Tienda Online (Flask + PostgreSQL)
 
 Sistema de tienda online desarrollado con Python, Flask, PostgreSQL y Bootstrap para la gestión de catálogo de productos físicos, digitales y perecibles, autenticación por roles y carrito de compras.
@@ -9,6 +8,7 @@ Sistema de tienda online desarrollado con Python, Flask, PostgreSQL y Bootstrap 
 ```bash
 git clone [https://github.com/Mari-Vasquez/Proyecto-Tienda-Online.git](https://github.com/Mari-Vasquez/Proyecto-Tienda-Online.git)
 cd Proyecto-Tienda-Online
+
 2. Crear y activar el entorno virtual
 Bash
 python -m venv venv
@@ -20,7 +20,7 @@ source venv/bin/activate
 Bash
 pip install -r requirements.txt
 4. Configurar la Base de Datos PostgreSQL
-Asegúrate de tener PostgreSQL ejecutándose y ajusta las variables en config.py:
+Ajusta las variables en config.py o .env:
 
 Plaintext
 DATABASE_URL=postgresql://postgres:tu_contraseña@localhost:5432/tienda_online
@@ -43,6 +43,7 @@ Email: cliente@tienda.com
 Contraseña: cliente123
 
 📸 Capturas de Pantalla
+
 Catálogo de Productos
 ### Catálogo de Productos
 ![Catálogo](static/uploads/catalogo.png)
@@ -52,20 +53,3 @@ Detalle del Producto
 Carrito de Compras
 ### Carrito de Compras
 ![Carrito](static/uploads/carrito.png)
-
----
-
-**2. Verificar que `static` no esté en `.gitignore`**
-
-Asegúrate de que en tu archivo `.gitignore` no esté incluida la palabra `static`, para que Git reconozca la carpeta `static/uploads` con las imágenes de los productos.
-
----
-
-**3. Subir los cambios actualizados a GitHub**
-
-Abre la terminal en VS Code y ejecuta los siguientes tres comandos:
-
-```bash
-git add .
-git commit -m "Añadidos README.md y carpeta static con imagenes"
-git push -u origin main
