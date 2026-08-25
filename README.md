@@ -25,6 +25,7 @@ Ajusta las variables en config.py o .env:
 Plaintext
 DATABASE_URL=postgresql://postgres:tu_contraseña@localhost:5432/tienda_online
 SECRET_KEY=tu_clave_secreta
+
 5. Inicializar la base de datos y ejecutar la app
 Bash
 python init_db.py
@@ -42,14 +43,13 @@ Email: cliente@tienda.com
 
 Contraseña: cliente123
 
-📸 Capturas de Pantalla
+## 📸 Capturas de Pantalla
 
-Catálogo de Productos
 ### Catálogo de Productos
-![Catálogo](static/uploads/catalogo.png)
-Detalle del Producto
+![Catálogo](./static/uploads/catalogo.png)
+
 ### Detalle del Producto
-![Detalle](static/uploads/detalle.png)
-Carrito de Compras
+![Detalle](./static/uploads/detalle.png)
+
 ### Carrito de Compras
-![Carrito](static/uploads/carrito.png)
+![Carrito](./static/uploads/carrito.png)
