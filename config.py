@@ -8,7 +8,7 @@ load_dotenv()
 class Config:
     # Datos de conexión a PostgreSQL, tomados del .env
     DB_USER = os.getenv("DB_USER", "postgres")
-    DB_PASSWORD = os.getenv("DB_PASSWORD", "postgres123")
+    DB_PASSWORD = os.getenv("DB_PASSWORD", "base1234")
     DB_HOST = os.getenv("DB_HOST", "localhost")
     DB_PORT = os.getenv("DB_PORT", "5432")
     DB_NAME = os.getenv("DB_NAME", "tienda_online")

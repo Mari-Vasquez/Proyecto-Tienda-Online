@@ -46,6 +46,9 @@ class Producto(db.Model):
     stock = db.Column(db.Integer, default=0)
     activo = db.Column(db.Boolean, default=True)
 
+    # Nueva columna para almacenar la ruta o nombre del archivo de imagen
+    imagen = db.Column(db.String(255), nullable=True, default="default.jpg")
+
     # Columnas exclusivas de ProductoFisico (quedan NULL en otros tipos)
     peso_kg = db.Column(db.Float, nullable=True)
     costo_envio_por_kg = db.Column(db.Float, nullable=True)
@@ -110,3 +113,4 @@ class ProductoPerecible(Producto):
         elif dias <= 7:
             return self.precio_base * 0.80
         return self.precio_base
+

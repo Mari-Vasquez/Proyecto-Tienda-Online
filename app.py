@@ -1,15 +1,44 @@
 #PUNTO DE ENTRADA A LA APLICACION
 
-from auth import login_requerido, rol_requerido
+# PUNTO DE ENTRADA A LA APLICACION
+
+import os
+from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, session, flash
+from werkzeug.utils import secure_filename
+from auth import login_requerido, rol_requerido
 from config import Config
 from models import db, Producto, ProductoFisico, ProductoDigital, ProductoPerecible, Usuario
 
 app = Flask(__name__)
 app.config.from_object(Config)
 
+# Configuración para subida de imágenes
+UPLOAD_FOLDER = os.path.join('static', 'uploads')
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# Asegurar que la carpeta static/uploads exista
+os.makedirs(os.path.join(app.root_path, app.config['UPLOAD_FOLDER']), exist_ok=True)
+
 # Conecta esta app con la instancia de SQLAlchemy definida en models.py
 db.init_app(app)
+
+
+def archivo_permitido(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+def procesar_imagen(request_file):
+    """Función auxiliar para guardar la imagen cargada o retornar 'default.jpg'."""
+    if request_file and request_file.filename != '' and archivo_permitido(request_file.filename):
+        filename = secure_filename(request_file.filename)
+        # Añadir timestamp para evitar sobrescribir archivos con el mismo nombre
+        nombre_unico = f"{datetime.now().strftime('%Y%m%d%H%M%S')}_{filename}"
+        ruta_guardado = os.path.join(app.root_path, app.config['UPLOAD_FOLDER'], nombre_unico)
+        request_file.save(ruta_guardado)
+        return nombre_unico
+    return 'default.jpg'
 
 
 @app.route("/")
@@ -31,6 +60,8 @@ def detalle_producto(producto_id):
 def nuevo_producto_fisico():
     if request.method == "POST":
         try:
+            imagen_nombre = procesar_imagen(request.files.get("imagen"))
+            
             producto = ProductoFisico(
                 codigo=request.form["codigo"],
                 nombre=request.form["nombre"],
@@ -38,6 +69,7 @@ def nuevo_producto_fisico():
                 stock=int(request.form["stock"]),
                 peso_kg=float(request.form["peso_kg"]),
                 costo_envio_por_kg=float(request.form["costo_envio_por_kg"]),
+                imagen=imagen_nombre
             )
             db.session.add(producto)
             db.session.commit()
@@ -57,12 +89,15 @@ def nuevo_producto_fisico():
 def nuevo_producto_digital():
     if request.method == "POST":
         try:
+            imagen_nombre = procesar_imagen(request.files.get("imagen"))
+
             producto = ProductoDigital(
                 codigo=request.form["codigo"],
                 nombre=request.form["nombre"],
                 precio_base=float(request.form["precio_base"]),
                 stock=int(request.form["stock"]),
                 licencia=request.form["licencia"],
+                imagen=imagen_nombre
             )
             db.session.add(producto)
             db.session.commit()
@@ -82,12 +117,15 @@ def nuevo_producto_digital():
 def nuevo_producto_perecible():
     if request.method == "POST":
         try:
+            imagen_nombre = procesar_imagen(request.files.get("imagen"))
+
             producto = ProductoPerecible(
                 codigo=request.form["codigo"],
                 nombre=request.form["nombre"],
                 precio_base=float(request.form["precio_base"]),
                 stock=int(request.form["stock"]),
                 dias_para_vencer=int(request.form["dias_para_vencer"]),
+                imagen=imagen_nombre
             )
             db.session.add(producto)
             db.session.commit()
@@ -101,6 +139,7 @@ def nuevo_producto_perecible():
 
     return render_template("nuevo_perecible.html")
 
+
 @app.route("/productos/<int:producto_id>/editar", methods=["GET", "POST"])
 @rol_requerido("admin")
 def editar_producto(producto_id):
@@ -111,6 +150,14 @@ def editar_producto(producto_id):
             producto.nombre = request.form["nombre"]
             producto.precio_base = float(request.form["precio_base"])
             producto.stock = int(request.form["stock"])
+
+            # Actualizar imagen solo si se seleccionó una nueva
+            file = request.files.get("imagen")
+            if file and file.filename != '':
+                nueva_imagen = procesar_imagen(file)
+                if nueva_imagen != 'default.jpg':
+                    producto.imagen = nueva_imagen
+
             db.session.commit()
             flash(f"Producto '{producto.nombre}' actualizado correctamente.", "success")
             return redirect(url_for("detalle_producto", producto_id=producto.id))
@@ -118,6 +165,7 @@ def editar_producto(producto_id):
             flash("Revisa que los campos numéricos tengan valores válidos.", "danger")
 
     return render_template("editar.html", producto=producto)
+
 
 @app.route("/productos/<int:producto_id>/eliminar", methods=["POST"])
 @rol_requerido("admin")
@@ -128,6 +176,7 @@ def eliminar_producto(producto_id):
     flash(f"Producto '{producto.nombre}' desactivado del catálogo.", "success")
     return redirect(url_for("inicio"))
 
+
 @app.route("/registro", methods=["GET", "POST"])
 def registro():
     if request.method == "POST":
@@ -137,10 +186,13 @@ def registro():
             flash("Ya existe una cuenta con ese correo.", "danger")
             return render_template("registro.html")
 
+        # Capturar el valor seleccionado en la plantilla (<select name="rol">)
+        rol_seleccionado = request.form.get("rol", "cliente")
+
         usuario = Usuario(
             nombre=request.form["nombre"],
             email=email,
-            rol="cliente",
+            rol=rol_seleccionado,  # <--- Asigna el rol elegido ("cliente" o "admin")
         )
         usuario.set_password(request.form["password"])
         db.session.add(usuario)
@@ -150,6 +202,7 @@ def registro():
         return redirect(url_for("login"))
 
     return render_template("registro.html")
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -170,11 +223,13 @@ def login():
 
     return render_template("login.html")
 
+
 @app.route("/logout")
 def logout():
     session.clear()
     flash("Sesión cerrada correctamente.", "success")
     return redirect(url_for("inicio"))
+
 
 @app.route("/carrito/agregar/<int:producto_id>", methods=["POST"])
 @login_requerido
@@ -188,6 +243,7 @@ def agregar_carrito(producto_id):
 
     flash(f"'{producto.nombre}' agregado al carrito.", "success")
     return redirect(request.referrer or url_for("inicio"))
+
 
 @app.route("/carrito")
 @login_requerido
@@ -205,6 +261,7 @@ def ver_carrito():
 
     return render_template("carrito.html", items=items, total=total)
 
+
 @app.route("/carrito/eliminar/<int:producto_id>", methods=["POST"])
 @login_requerido
 def eliminar_carrito(producto_id):
@@ -217,6 +274,7 @@ def eliminar_carrito(producto_id):
         flash("Producto quitado del carrito.", "success")
 
     return redirect(url_for("ver_carrito"))
+
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -3,35 +3,76 @@
 {% block titulo %}Catálogo — Tienda Online{% endblock %}
 
 {% block content %}
-    <h1 class="mb-4">Catálogo de Productos</h1>
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2 fw-bold text-dark mb-0">Catálogo de Productos</h1>
+        {% if session.get('usuario_rol') == 'admin' %}
+        <div class="dropdown">
+            <button class="btn btn-success btn-sm dropdown-toggle shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                + Nuevo Producto
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-menu-item dropdown-item" href="{{ url_for('nuevo_producto_fisico') }}">Producto Físico</a></li>
+                <li><a class="dropdown-menu-item dropdown-item" href="{{ url_for('nuevo_producto_digital') }}">Producto Digital</a></li>
+                <li><a class="dropdown-menu-item dropdown-item" href="{{ url_for('nuevo_producto_perecible') }}">Producto Perecible</a></li>
+            </ul>
+        </div>
+        {% endif %}
+    </div>
 
-    <div class="row">
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
         {% for producto in productos %}
-        <div class="col-md-4 mb-4">
-            <div class="card h-100">
-                <div class="card-body">
-                    <span class="badge bg-secondary mb-2">{{ producto.tipo }}</span>
-                    <h5 class="card-title">{{ producto.nombre }}</h5>
-                    <p class="card-text text-muted">Código: {{ producto.codigo }}</p>
-                    <p class="card-text fs-4 fw-bold">
-                        ${{ "%.2f"|format(producto.precio_final()) }}
-                    </p>
-                    <a href="{{ url_for('detalle_producto', producto_id=producto.id) }}"
-                       class="btn btn-primary">
-                        Ver detalle
-                    </a>
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0 rounded-3 overflow-hidden">
+                <!-- Imagen del Producto con fallback predeterminado -->
+                <div class="position-relative">
+                    <img src="{{ url_for('static', filename='uploads/' + (producto.imagen if producto.imagen else 'default.jpg')) }}" 
+                        class="card-img-top" 
+                        alt="{{ producto.nombre }}"
+                        style="height: 200px; object-fit: cover;">
+                    
+                    <!-- Insignia según tipo de producto -->
+                    <span class="position-absolute top-0 end-0 m-2 badge rounded-pill 
+                        {% if producto.tipo == 'fisico' %}bg-info text-dark
+                        {% elif producto.tipo == 'digital' %}bg-purple bg-primary
+                        {% elif producto.tipo == 'perecible' %}bg-warning text-dark
+                        {% else %}bg-secondary{% endif %}">
+                        {{ producto.tipo|capitalize }}
+                    </span>
+                </div>
 
-                    {% if session.get('usuario_rol') == 'cliente' %}
-                    <form action="{{ url_for('agregar_carrito', producto_id=producto.id) }}" method="POST">
-                        <button type="submit" class="btn btn-primary">🛍️</button>
-                    </form>
-                    {% endif %}
+                <div class="card-body d-flex flex-column p-3">
+                    <small class="text-muted mb-1">Cód: {{ producto.codigo }}</small>
+                    <h5 class="card-title fs-6 fw-bold text-dark text-truncate mb-2">{{ producto.nombre }}</h5>
+                    
+                    <div class="mt-auto pt-2">
+                        <p class="card-text fs-5 fw-bold text-success mb-3">
+                            ${{ "%.2f"|format(producto.precio_final()) }}
+                        </p>
+                        
+                        <div class="d-flex gap-2">
+                            <a href="{{ url_for('detalle_producto', producto_id=producto.id) }}" 
+                               class="btn btn-outline-primary btn-sm flex-grow-1">
+                                Ver detalle
+                            </a>
 
+                            {% if session.get('usuario_rol') == 'cliente' %}
+                            <form action="{{ url_for('agregar_carrito', producto_id=producto.id) }}" method="POST" class="m-0">
+                                <button type="submit" class="btn btn-primary btn-sm" title="Agregar al carrito">
+                                    🛒
+                                </button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
         {% else %}
-        <p class="text-center text-muted">No hay productos disponibles todavía.</p>
+        <div class="col-12 text-center py-5">
+            <p class="text-muted fs-5">No hay productos disponibles actualmente en el catálogo.</p>
+        </div>
         {% endfor %}
     </div>
+</div>
 {% endblock %}

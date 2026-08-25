@@ -1,36 +1,53 @@
 {% extends "base.html" %}
-{% block titulo %}Nuevo Producto Perecible{% endblock %}
+
+{% block titulo %}Nuevo Producto Perecible — Tienda Online{% endblock %}
+
 {% block content %}
+<div class="container py-4">
     <a href="{{ url_for('inicio') }}" class="btn btn-outline-secondary mb-3">← Volver al catálogo</a>
-    <div class="card">
-        <div class="card-body">
+
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-body p-4">
             <h2 class="mb-4">🍓 Nuevo Producto Perecible</h2>
-            <form method="POST">
+
+            <form method="POST" enctype="multipart/form-data">
                 <div class="mb-3">
-                    <label class="form-label">Código</label>
+                    <label class="form-label fw-semibold">Código</label>
                     <input type="text" class="form-control" name="codigo" required>
                 </div>
+
                 <div class="mb-3">
-                    <label class="form-label">Nombre</label>
+                    <label class="form-label fw-semibold">Nombre</label>
                     <input type="text" class="form-control" name="nombre" required>
                 </div>
+
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">Precio base ($)</label>
+                        <label class="form-label fw-semibold">Precio base ($)</label>
                         <input type="number" step="0.01" class="form-control" name="precio_base" required>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">Stock inicial</label>
+                        <label class="form-label fw-semibold">Stock inicial</label>
                         <input type="number" class="form-control" name="stock" required>
                     </div>
                 </div>
+
                 <div class="mb-3">
-                    <label class="form-label">Días para vencer</label>
+                    <label class="form-label fw-semibold">Días para vencer</label>
                     <input type="number" class="form-control" name="dias_para_vencer" required>
                     <small class="text-muted">3 días o menos = 50% descuento · 7 días o menos = 20% descuento</small>
                 </div>
+
+                <!-- Campo para subida de imagen -->
+                <div class="mb-4">
+                    <label for="imagen" class="form-label fw-semibold">Imagen del Producto</label>
+                    <input type="file" class="form-control" name="imagen" accept="image/*">
+                    <small class="text-muted">Si no seleccionas un archivo, se usará la imagen predeterminada.</small>
+                </div>
+
                 <button type="submit" class="btn btn-primary">Crear producto</button>
             </form>
         </div>
     </div>
+</div>
 {% endblock %}
